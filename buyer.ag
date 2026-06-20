@@ -1,0 +1,59 @@
+// buyer.ag
+// Axiom L1 (intent.igra) + L2 (auth.igra, inline spend policy) + L4 (escrow.igra lock)
+//
+// In real Argent there is no separate "intent" or "auth" covenant - those are
+// Axiom-layer concepts, not Argent primitives. Concretely they collapse into
+// the require() checks inside a single leader entry. This is an honest
+// simplification versus the earlier draft, which invented separate
+// intent.igra/auth.igra actors that have no equivalent in the real grammar.
+
+import "./types.ag";
+import actor Escrow from "./escrow.ag";
+
+actor BuyerAgent owns BuyerTreasuryState {
+
+    // One leader entry expresses the intent ("pay provider X up to N KAS")
+    // and the authorization check (owner signature + spend policy) together,
+    // then locks funds into a new Escrow output.
+    entry purchase(
+        owner_sig: sig,
+        owner_pk: pubkey,
+        provider: byte[32],
+        amount: int,
+        timeout_height: int
+    ) emits {
+        buyer_out: BuyerAgent;
+        escrow: Escrow;
+    } {
+        // auth.igra, inline: identity + signature check
+        require(blake2b(owner_pk) == owner);
+        require(checkSig(owner_sig, owner_pk));
+
+        // simple spend policy (the "scoped permission" from Axiom L2)
+        require(amount > 0);
+        require(amount <= max_per_tx);
+        require(amount <= balance);
+
+        BuyerTreasuryState next_buyer = {
+            owner: owner,
+            balance: balance - amount,
+            max_per_tx: max_per_tx,
+        };
+
+        EscrowState new_escrow = {
+            buyer: owner,
+            provider: provider,
+            amount: amount,
+            timeout_height: timeout_height,
+        };
+
+        // value policy: the locked amount must actually move into escrow
+        require(escrow.value == amount);
+        require(buyer_out.value == self.value - amount);
+
+        become {
+            buyer_out <- BuyerAgent(next_buyer);
+            escrow <- Escrow(new_escrow);
+        };
+    }
+}

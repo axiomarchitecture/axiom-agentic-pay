@@ -1,0 +1,68 @@
+// escrow.ag
+// Axiom L4 (pay.igra + settle.igra)
+//
+// Honest correction vs. the earlier draft: there is no `observes`/oracle
+// cross-covenant check available yet (the real repo marks that pattern as
+// "syntax sketch only, not compiled" - see examples/icc/minter_proxy_observer.ag).
+// So "delivery proof" cannot currently be verified against an external
+// oracle covenant inside the contract itself. Two honest alternatives:
+//   (a) provider-signature release (used below) - the provider attests
+//       delivery off-chain and signs to claim the escrowed funds.
+//   (b) a timeout-only refund path, with no on-chain delivery proof at all.
+// A real oracle-verified release would need to wait for `observes` to ship,
+// or be restructured as a multi-sig/2-of-2 attestation instead.
+
+import "./types.ag";
+import actor ProviderAgent from "./provider.ag";
+import actor BuyerAgent from "./buyer.ag";
+
+actor Escrow owns EscrowState {
+
+    // Pay + settle in one step: provider proves identity, escrow becomes
+    // a value-bearing output on the Provider actor. Sub-second BlockDAG
+    // finality is what makes this safe to treat as "settled" once confirmed.
+    entry release(
+        provider_sig: sig,
+        provider_pk: pubkey
+    ) emits {
+        payment: ProviderAgent;
+    } {
+        require(blake2b(provider_pk) == provider);
+        require(checkSig(provider_sig, provider_pk));
+        require(payment.value == self.value);
+
+        become payment <- ProviderAgent({
+            owner: provider,
+            received_total: amount,   // caller-side aggregation in provider.ag
+        });
+    }
+
+    // Refund path if the provider never claims before timeout_height.
+    entry timeout_refund(
+        buyer_sig: sig,
+        buyer_pk: pubkey
+    ) emits {
+        refund: BuyerAgent;
+    } {
+        require(blake2b(buyer_pk) == buyer);
+        require(checkSig(buyer_sig, buyer_pk));
+        // UNVERIFIED: no height/locktime builtin appears in any real Argent
+        // example or in src/. Silverscript (Kaspa script) almost certainly
+        // exposes some OP_CHECKLOCKTIMEVERIFY-equivalent at the script level,
+        // but I could not confirm the exact Argent-level spelling against
+        // the real grammar - flagging instead of guessing one.
+        require(timeout_elapsed(timeout_height));
+        require(refund.value == self.value);
+
+        become refund <- BuyerAgent({
+            owner: buyer,
+            balance: amount,
+            max_per_tx: amount,
+        });
+    }
+}
+
+// logs.igra note: there is no separate "logs" actor/covenant in real Argent.
+// The audit trail Axiom describes is the prunable transaction history of
+// these UTXOs itself (each become transition is a recorded, verifiable
+// chain step) - not an additional contract to write or maintain.

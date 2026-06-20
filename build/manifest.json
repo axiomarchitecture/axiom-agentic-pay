@@ -1,0 +1,67 @@
+{
+  "app": "AgenticPay",
+  "root": "/home/claude/agenticpay/app.ag",
+  "modules": [
+    "/home/claude/agenticpay/app.ag",
+    "/home/claude/agenticpay/types.ag",
+    "/home/claude/agenticpay/buyer.ag",
+    "/home/claude/agenticpay/escrow.ag",
+    "/home/claude/agenticpay/provider.ag"
+  ],
+  "templates": [
+    { "actor": "BuyerAgent", "symbol": "template_buyer_agent", "hash": null },
+    { "actor": "Escrow", "symbol": "template_escrow", "hash": null },
+    { "actor": "ProviderAgent", "symbol": "template_provider_agent", "hash": null }
+  ],
+  "actors": [
+    {
+      "name": "BuyerAgent",
+      "state": "BuyerTreasuryState",
+      "sil": "sil/BuyerAgent.sil",
+      "entries": [
+        {
+          "name": "purchase",
+          "kind": "leader",
+          "emits": { "kind": "outputs", "outputs": [{ "name": "buyer_out", "auth_index": 0, "actors": ["BuyerAgent"] }, { "name": "escrow", "auth_index": 1, "actors": ["Escrow"] }] },
+          "consumes": [],
+          "routes": [{ "output": "buyer_out", "actor": "BuyerAgent", "state": "next_buyer" }, { "output": "escrow", "actor": "Escrow", "state": "new_escrow" }]
+        }
+      ]
+    },
+    {
+      "name": "Escrow",
+      "state": "EscrowState",
+      "sil": "sil/Escrow.sil",
+      "entries": [
+        {
+          "name": "release",
+          "kind": "leader",
+          "emits": { "kind": "outputs", "outputs": [{ "name": "payment", "auth_index": 0, "actors": ["ProviderAgent"] }] },
+          "consumes": [],
+          "routes": [{ "output": "payment", "actor": "ProviderAgent", "state": "{ owner: provider, received_total: amount, }" }]
+        },
+        {
+          "name": "timeout_refund",
+          "kind": "leader",
+          "emits": { "kind": "outputs", "outputs": [{ "name": "refund", "auth_index": 0, "actors": ["BuyerAgent"] }] },
+          "consumes": [],
+          "routes": [{ "output": "refund", "actor": "BuyerAgent", "state": "{ owner: buyer, balance: amount, max_per_tx: amount, }" }]
+        }
+      ]
+    },
+    {
+      "name": "ProviderAgent",
+      "state": "ProviderState",
+      "sil": "sil/ProviderAgent.sil",
+      "entries": [
+        {
+          "name": "withdraw",
+          "kind": "leader",
+          "emits": { "kind": "none" },
+          "consumes": [],
+          "routes": []
+        }
+      ]
+    }
+  ]
+}

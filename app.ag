@@ -1,0 +1,11 @@
+// app.ag
+import "./types.ag";
+import "./buyer.ag";
+import "./escrow.ag";
+import "./provider.ag";
+
+app AgenticPay {
+    actor BuyerAgent;
+    actor Escrow;
+    actor ProviderAgent;
+}

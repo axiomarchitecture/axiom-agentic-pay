@@ -1,0 +1,26 @@
+// types.ag
+// Shared state layouts for the Agentic Pay conceptual draft (Axiom L1-L4).
+//
+// NOTE: this file is a conceptual sketch written against the real Argent
+// grammar (verified against michaelsutton/argent @ master, June 2026).
+// It has NOT been run through the actual compiler (toolchain mismatch in
+// this environment - argent requires Rust edition2024). Treat as an
+// unverified draft, not working code.
+
+state BuyerTreasuryState {
+    byte[32] owner;          // blake2b(owner_pk) - agents.igra identity
+    int balance;             // KAS subunits
+    int max_per_tx;          // simple spend policy (auth.igra, inline)
+}
+
+state EscrowState {
+    byte[32] buyer;
+    byte[32] provider;
+    int amount;
+    int timeout_height;      // block height after which buyer may reclaim
+}
+
+state ProviderState {
+    byte[32] owner;
+    int received_total;
+}

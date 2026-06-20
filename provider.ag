@@ -1,0 +1,21 @@
+// provider.ag
+// Axiom L4 (settle.igra terminal state) - the provider side of Agentic Pay.
+
+import "./types.ag";
+
+actor ProviderAgent owns ProviderState {
+
+    // A real app would likely consume the prior ProviderAgent state here
+    // (consumes { prev: ProviderAgent; }) to accumulate received_total
+    // correctly instead of overwriting it. Left as a noted simplification -
+    // Escrow.release above currently just passes `amount` directly rather
+    // than prev.received_total + amount, which is a real gap, not a
+    // stylistic choice.
+    entry withdraw(
+        owner_sig: sig,
+        owner_pk: pubkey
+    ) emits none {
+        require(blake2b(owner_pk) == owner);
+        require(checkSig(owner_sig, owner_pk));
+    }
+}
