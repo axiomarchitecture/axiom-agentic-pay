@@ -1,4 +1,4 @@
-# Agentic Pay
+# Agentic Pay — A Conceptual Argent Reference Implementation
 
 A conceptual reference implementation showing how the protocol-independent
 **Axiom Reference Model** can be expressed using Kaspa's native **Argent**
