@@ -1,8 +1,8 @@
-# Agentic Pay — A Conceptual Argent Reference Implementation
+# Agentic Pay
 
-A conceptual reference implementation showing how the protocol-independent
-**Axiom Reference Model** can be expressed using Kaspa's native **Argent**
-language.
+*A conceptual Argent reference implementation of the protocol-independent Axiom Reference Model.*
+
+A conceptual reference implementation showing how the protocol-independent **Axiom Reference Model** can be expressed using Kaspa's native **Argent** language.
 
 This repository is **not** an official Kaspa, Argent or x402 project.
 
@@ -12,20 +12,21 @@ Its purpose is educational:
 - explore native covenant-based commerce on Kaspa
 - provide a concrete reference implementation for discussion and learning
 
+The implementation intentionally stays close to native Kaspa concepts while remaining independent of any protocol specification.
+
 ---
 
 # Relationship to Axiom
 
 Axiom is a protocol-independent semantic reference model.
 
-Axiom describes economic meaning. Argent expresses executable behavior.
-
 Argent is an implementation language for native Kaspa covenants.
 
 This repository explores **one possible mapping** between the two.
 
-It should not be interpreted as an official implementation of Axiom,
-nor as guidance from the Argent or Kaspa teams.
+> **Axiom describes economic meaning. Argent expresses executable behavior.**
+
+It should not be interpreted as an official implementation of Axiom, nor as guidance from the Argent or Kaspa teams.
 
 ---
 
@@ -41,8 +42,7 @@ Buyer Agent
 Provider Agent
 ```
 
-The example intentionally focuses on the minimal execution flow rather than
-implementing a complete commerce protocol.
+The example intentionally focuses on the minimal execution flow rather than implementing a complete commerce protocol.
 
 ---
 
@@ -58,17 +58,13 @@ implementing a complete commerce protocol.
 | Settlement | Provider release |
 | Audit | Kaspa UTXO history |
 
-This mapping is conceptual.
-
-Axiom describes **economic meaning**.
-
-Argent describes **executable behavior**.
+This mapping is conceptual and intended for discussion and education rather than as a normative specification.
 
 ---
 
 # Current Status
 
-✅ Compiles successfully using the real Argent compiler
+✅ Compiles successfully using the real Argent compiler.
 
 Tested against:
 
@@ -77,7 +73,7 @@ Tested against:
 - Local compilation
 - Generated Silverscript output
 
-Generated artifacts:
+Generated artifacts include:
 
 - BuyerAgent.sil
 - Escrow.sil
@@ -87,7 +83,7 @@ Generated artifacts:
 
 # Current Limitations
 
-This repository intentionally demonstrates concepts rather than production-ready contracts.
+This repository intentionally demonstrates concepts rather than production-ready covenant implementations.
 
 Known limitations include:
 
@@ -104,21 +100,17 @@ The generated contracts should therefore be viewed as educational reference mate
 
 Most protocol documentation explains **how** something works.
 
-This repository explores **why** different components exist by connecting
-them to a protocol-independent semantic model.
+This repository explores **why** different components exist by connecting them to a protocol-independent semantic model.
 
-The goal is to make covenant-based agent commerce easier to understand,
-compare and discuss across implementations.
+The goal is to make covenant-based agent commerce easier to understand, compare and discuss across implementations.
 
 ---
 
 # Acknowledgements
 
-Special thanks to the Kaspa and Argent developers whose documentation,
-examples and discussions helped shape this exploration.
+Special thanks to the Kaspa and Argent developers whose documentation, examples and technical discussions helped shape this exploration.
 
-In particular, feedback from the community helped improve the distinction
-between the protocol-independent Axiom model and native Kaspa implementation.
+In particular, feedback from the community helped improve the distinction between the protocol-independent Axiom model and native Kaspa implementation.
 
 ---
 
