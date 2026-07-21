@@ -18,6 +18,8 @@ Its purpose is educational:
 
 Axiom is a protocol-independent semantic reference model.
 
+Axiom describes economic meaning. Argent expresses executable behavior.
+
 Argent is an implementation language for native Kaspa covenants.
 
 This repository explores **one possible mapping** between the two.
